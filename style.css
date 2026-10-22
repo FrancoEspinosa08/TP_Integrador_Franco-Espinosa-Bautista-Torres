@@ -1,0 +1,240 @@
+:root {
+    --color-primario: #2563eb;
+    --color-secundario: #1e40af;
+    --color-fondo: #f8fafc;
+    --color-texto: #1e293b;
+    --color-blanco: #ffffff;
+    --color-gris: #e2e8f0;
+    --color-exito: #16a34a;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Encabezado */
+header {
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+header h1 {
+    font-size: 1.5rem;
+}
+
+/* Contenedor Principal */
+.contenedor-principal {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Sección de Catálogo */
+.seccion-catalogo {
+    flex: 3;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Barra de navegación por botones para tipos de productos */
+.barra-categorias {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-categoria {
+    flex: 1;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    background-color: var(--color-blanco);
+    border: 2px solid var(--color-primario);
+    color: var(--color-primario);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-categoria.activo, .btn-categoria:hover {
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+}
+
+/* Cuadrícula de Productos */
+.grilla-productos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.tarjeta-producto {
+    background-color: var(--color-blanco);
+    border: 1px solid var(--color-gris);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.tarjeta-producto h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.precio-producto {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--color-primario);
+    margin-bottom: 1rem;
+}
+
+.btn-agregar {
+    background-color: var(--color-exito);
+    color: var(--color-blanco);
+    border: none;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-agregar:hover {
+    background-color: #15803d;
+}
+
+/* Sección del Carrito / Resumen */
+.seccion-carrito {
+    flex: 1.2;
+    background-color: var(--color-blanco);
+    border-left: 1px solid var(--color-gris);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.lista-carrito {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 1rem;
+    border-top: 1px solid var(--color-gris);
+    border-bottom: 1px solid var(--color-gris);
+    padding: 0.5rem 0;
+}
+
+.item-carrito {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px dashed var(--color-gris);
+}
+
+.total-contenedor {
+    font-size: 1.3rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0;
+}
+
+.btn-finalizar {
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+.btn-finalizar:hover {
+    background-color: var(--color-secundario);
+}
+
+/* Modal del Ticket */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.contenido-modal {
+    background-color: var(--color-blanco);
+    padding: 2rem;
+    border-radius: 8px;
+    width: 350px;
+    text-align: center;
+}
+
+.contenido-modal h2 {
+    margin-bottom: 1rem;
+    color: var(--color-primario);
+}
+
+.ticket-detalle {
+    text-align: left;
+    margin: 1rem 0;
+    font-family: monospace;
+    font-size: 0.9rem;
+    border-top: 1px dashed #000;
+    border-bottom: 1px dashed #000;
+    padding: 0.5rem 0;
+}
+
+.btn-cerrar-modal {
+    background-color: var(--color-texto);
+    color: var(--color-blanco);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+/* Diseño Responsive para móviles */
+@media (max-width: 768px) {
+    .contenedor-principal {
+        flex-direction: column;
+    }
+    body {
+        overflow: auto;
+    }
+    .seccion-carrito {
+        max-height: 300px;
+    }
+}
