@@ -1,0 +1,28 @@
+{
+  "name": "tp_integrador_franco-espinosa-bautista-torres",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FrancoEspinosa08/TP_Integrador_Franco-Espinosa-Bautista-Torres.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/FrancoEspinosa08/TP_Integrador_Franco-Espinosa-Bautista-Torres/issues"
+  },
+  "homepage": "https://github.com/FrancoEspinosa08/TP_Integrador_Franco-Espinosa-Bautista-Torres#readme",
+  "dependencies": {
+    "ejs": "^7.0.2",
+    "express": "^5.3.0",
+    "mysql2": "^3.24.6",
+    "sequelize": "^6.37.8",
+    "sqlite3": "^6.0.1"
+  }
+}

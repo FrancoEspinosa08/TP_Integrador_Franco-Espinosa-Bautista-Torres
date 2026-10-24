@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiosco de Autoservicio - Accesorios Tecnológicos</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- Encabezado de la Terminal de Autoservicio -->
+    <header>
+        <h1>Terminal de Autoservicio - Kiosco Tecnológico</h1>
+        <span id="reloj"></span>
+    </header>
+
+    <!-- Contenedor Principal dividido en Catálogo y Carrito -->
+    <div class="contenedor-principal">
+        
+        <!-- Catálogo de Productos -->
+        <div class="seccion-catalogo">
+            <h2>Seleccione una categoría</h2>
+            
+            <!-- Botones de navegación exclusiva por categorías -->
+            <div class="barra-categorias">
+                <button class="btn-categoria activo" onclick="filtrarProductos('todos', event)">Todos los Productos</button>
+                <button class="btn-categoria" onclick="filtrarProductos('perifericos', event)">Periféricos y Conectividad</button>
+                <button class="btn-categoria" onclick="filtrarProductos('escritorio', event)">Organización y Escritorio</button>
+            </div>
+
+            <!-- Grilla donde se renderizan los productos -->
+            <div id="grilla-productos" class="grilla-productos">
+                <!-- Los productos se cargan dinámicamente mediante JavaScript -->
+            </div>
+        </div>
+
+        <!-- Resumen del Carrito -->
+        <div class="seccion-carrito">
+            <h2>Su Compra</h2>
+            <div id="lista-carrito" class="lista-carrito">
+                <p style="color: #64748b; text-align: center; margin-top: 2rem;">El carrito está vacío</p>
+            </div>
+            <div>
+                <div class="total-contenedor">
+                    <span>Total:</span>
+                    <span id="precio-total">$0.00</span>
+                </div>
+                <button class="btn-finalizar" onclick="finalizarCompra()">Finalizar Compra</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal del Ticket de Compra -->
+    <div id="modal-ticket" class="modal">
+        <div class="contenido-modal">
+            <h2>¡Compra Exitosa!</h2>
+            <p>Retire su ticket a continuación:</p>
+            <div id="ticket-detalle" class="ticket-detalle">
+                <!-- Detalle del ticket generado por JavaScript -->
+            </div>
+            <button class="btn-cerrar-modal" onclick="reiniciarKiosco()">Nueva Compra</button>
+        </div>
+    </div>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>
