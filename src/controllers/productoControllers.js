@@ -36,6 +36,53 @@ const productoController = {
         } catch (error) {
             res.status(500).json({ success: false, message: error.message });
         }
+    },
+    agregarProducto: async (req, res) => {
+        try {
+            const nombre = req.body.nombre;
+            const tipo = req.body.tipo;
+            const precio = req.body.precio;
+
+            await Producto.create({
+                nombre: nombre,
+                tipo: tipo,
+                precio: precio
+            });
+
+            res.redirect('/admin/productos');
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Error al agregar el producto");
+        }
+    },
+    listarProductosAdmin: async (req, res) => {
+    try {
+        const productos = await Producto.findAll();
+
+        res.render('dashboard', {
+            productos: productos
+        });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Error al cargar los productos");
+        }
+    },
+    eliminarProducto: async (req, res) => {
+        try {
+            const id = req.params.id;
+
+            await Producto.destroy({
+                where: { id: id }
+            });
+
+            res.redirect('/admin/productos/eliminar');
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Error al eliminar el producto");
+        }
     }
 };
 

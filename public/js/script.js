@@ -1,3 +1,16 @@
+function continuarAProductos() {
+    const nombre = document.getElementById("nombre-cliente").value;
+
+    if (nombre.trim() === "") {
+        alert("Por favor, ingrese su nombre.");
+        return;
+    }
+
+    sessionStorage.setItem("nombreCliente", nombre);
+
+    window.location.href = "/productos";
+}
+
 // Catálogo de productos del kiosco tecnológico
 let productosDisponibles = [];
 
@@ -71,6 +84,17 @@ function agregarAlCarrito(idProducto) {
     actualizarVistaCarrito();
 }
 
+// Función para quitar productos del carrito
+function quitarDelCarrito(idProducto) {
+    const itemExistente = carritoCompras.find(item => item.id === idProducto);
+    if (itemExistente.cantidad > 1) {
+        itemExistente.cantidad -= 1;
+    } else {
+        carritoCompras = carritoCompras.filter(item => item.id !== idProducto);
+    }
+    actualizarVistaCarrito();
+}
+
 // Función para actualizar el panel lateral del carrito
 function actualizarVistaCarrito() {
     const contenedorCarrito = document.getElementById("lista-carrito");
@@ -97,6 +121,7 @@ function actualizarVistaCarrito() {
                 <small>Cant: ${item.cantidad} x $${item.precio.toLocaleString('es-AR')}</small>
             </div>
             <span>$${subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+            <button onclick="quitarDelCarrito(${item.id})">Quitar</button>
         `;
         contenedorCarrito.appendChild(elementoItem);
     });

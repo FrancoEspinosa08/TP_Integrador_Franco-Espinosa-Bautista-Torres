@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar producto</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <div class="pantalla-bienvenida">
+        <h1>Agregar producto</h1>
+
+        <form action="/admin/productos/alta" method="POST">
+            <input type="text" name="nombre" placeholder="Nombre del producto" required>
+
+            <select name="tipo" required>
+                <option value="">Seleccionar categoría</option>
+                <option value="perifericos">Periféricos</option>
+                <option value="escritorio">Escritorio</option>
+            </select>
+
+            <input type="number" name="precio" placeholder="Precio" required>
+
+            <button type="submit">Guardar producto</button>
+        </form>
+
+        <button onclick="window.location.href='/admin/dashboard'">
+            Volver al panel
+        </button>
+    </div>
+
+</body>
+</html>
