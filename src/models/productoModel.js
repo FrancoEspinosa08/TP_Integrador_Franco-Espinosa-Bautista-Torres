@@ -18,6 +18,10 @@ const Producto = sequelize.define('Producto', {
     precio: {
         type: DataTypes.FLOAT,
         allowNull: false
+    },
+    activo: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
     }
 }, {
     tableName: 'productos',

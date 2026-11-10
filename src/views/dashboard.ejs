@@ -8,8 +8,17 @@
 </head>
 <body>
 
+    <header>
+        <h1>Panel de Administracion</h1>
+
+        <div class="usuario-header">
+            <span>Administrador</span>
+            <button onclick="window.location.href='/'">Salir</button>
+        </div>
+    </header>
+
     <div class="pantalla-bienvenida">
-        <h1>Panel de Administración</h1>
+        
         <p>Bienvenido al administrador del Kiosco Tecnológico.</p>
 
         <h2>Gestión de productos</h2>
@@ -22,10 +31,13 @@
             Agregar producto
         </button>
 
-        <button onclick="window.location.href='/admin/productos/eliminar'">
-            Eliminar productos
+        <button onclick="window.location.href='/admin/productos/darBaja'">
+            Dar de baja productos
         </button>
-        
+
+        <button onclick="window.location.href='/admin/productos/reactivar'">
+            Reactivar productos
+        </button>
     </div>
 
 </body>

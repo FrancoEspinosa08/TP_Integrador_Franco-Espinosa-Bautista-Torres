@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dar de baja productos</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Dar de baja productos</h1>
+    </header>
+
+    <div class="contenedor-principal">
+        <div class="seccion-catalogo">
+
+            <h2>Seleccione un producto para dar de baja</h2>
+
+            <div class="grilla-productos">
+                <% productos.forEach(producto => { %>
+                    <div class="tarjeta-producto">
+                        <div>
+                            <h3><%= producto.nombre %></h3>
+                            <p class="precio-producto">
+                                $<%= producto.precio %>
+                            </p>
+                        </div>
+
+                        <form action="/admin/productos/darBaja/<%= producto.id %>" method="POST"
+                            onsubmit="return confirm('¿Está seguro de dar de baja este producto?')">
+
+                            <button type="submit" class="btn-eliminar">
+                                Dar de baja
+                            </button>
+                        </form>
+                    </div>
+                <% }) %>
+            </div>
+
+            <button class="btn-volver" onclick="window.location.href='/admin/dashboard'">
+                Volver al panel
+            </button>
+
+        </div>
+    </div>
+
+</body>
+</html>

@@ -156,5 +156,30 @@ function reiniciarKiosco() {
     document.getElementById("modal-ticket").style.display = "none";
 }
 
-// Inicializar la grilla de productos al cargar el script
-cargarProductos();
+// Inicializar productos solamente en la pantalla del cliente
+if (!document.body.classList.contains("pantalla-administrador")) {
+    cargarProductos();
+}
+
+// Buscador de productos del administrador
+function buscarProductos() {
+    const texto = document.getElementById("buscador").value.toLowerCase();
+    const tarjetas = document.querySelectorAll(".tarjeta-producto");
+
+    tarjetas.forEach(tarjeta => {
+        const nombre = tarjeta.querySelector("h3").textContent.toLowerCase();
+
+        if (nombre.includes(texto)) {
+            tarjeta.style.display = "block";
+        } else {
+            tarjeta.style.display = "none";
+        }
+    });
+}
+
+// Mostrar nombre del cliente
+const nombre = sessionStorage.getItem("nombreCliente");
+
+if (document.getElementById("nombre-usuario")) {
+    document.getElementById("nombre-usuario").textContent = "Cliente: " + nombre;
+}

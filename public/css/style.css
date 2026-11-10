@@ -287,6 +287,31 @@ header h1 {
     background-color: var(--color-secundario);
 }
 
+/* Usuario y botón salir */
+.usuario-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.usuario-header span {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.usuario-header button {
+    background-color: white;
+    color: var(--color-primario);
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.usuario-header button:hover {
+    background-color: var(--color-gris);
+}
 
 /* Diseño Responsive para móviles */
 @media (max-width: 768px) {

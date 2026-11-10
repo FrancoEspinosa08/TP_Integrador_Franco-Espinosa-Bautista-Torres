@@ -4,7 +4,7 @@ const productoController = {
     // Renderiza la vista EJS trayendo los datos de Sequelize
     listarCatalogo: async (req, res) => {
         try {
-            let productos = await Producto.findAll();
+            let productos = await Producto.findAll({where: {activo: true}});
             
             // Si la base de datos está vacía, inserta los productos por defecto de tu kiosco
             if (productos.length === 0) {
@@ -18,7 +18,7 @@ const productoController = {
                     { nombre: "Organizador de Cables Silicona", tipo: "escritorio", precio: 3500.00 },
                     { nombre: "Lámpara LED de Escritorio USB", tipo: "escritorio", precio: 14500.00 }
                 ]);
-                productos = await Producto.findAll();
+                productos = await Producto.findAll({where: {activo: true}});
             }
 
             res.render('index', { productosDisponibles: productos });
@@ -31,7 +31,7 @@ const productoController = {
     // Respuesta en JSON para cumplir con el requerimiento de API
     listarJSON: async (req, res) => {
         try {
-            const productos = await Producto.findAll();
+            const productos = await Producto.findAll({where: {activo: true}});
             res.json({ success: true, data: productos });
         } catch (error) {
             res.status(500).json({ success: false, message: error.message });
@@ -60,7 +60,7 @@ const productoController = {
     try {
         const productos = await Producto.findAll();
 
-        res.render('dashboard', {
+        res.render('pantallaAdministrador', {
             productos: productos
         });
 
@@ -69,21 +69,38 @@ const productoController = {
             res.status(500).send("Error al cargar los productos");
         }
     },
-    eliminarProducto: async (req, res) => {
+    darBajaProducto: async (req, res) => {
         try {
             const id = req.params.id;
 
-            await Producto.destroy({
-                where: { id: id }
-            });
+            await Producto.update(
+                {activo: false},
+                {where: {id: id}}
+            );
 
-            res.redirect('/admin/productos/eliminar');
+            res.redirect('/admin/productos/darBaja');
 
         } catch (error) {
             console.error(error);
-            res.status(500).send("Error al eliminar el producto");
+            res.status(500).send("Error al dar de baja el producto");
         }
+    },
+    reactivarProducto: async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        await Producto.update(
+            {activo: true },
+            {where: {id: id}}
+        );
+
+        res.redirect('/admin/productos/reactivar');
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error al reactivar el producto");
     }
+}
 };
 
 module.exports = productoController;

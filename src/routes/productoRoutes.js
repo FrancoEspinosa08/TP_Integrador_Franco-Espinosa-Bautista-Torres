@@ -33,7 +33,7 @@ router.get('/admin/dashboard', (req, res) => {
 });
 
 // Ver productos del administrador
-router.get('/admin/productos', productoController.listarCatalogo);
+router.get('/admin/productos', productoController.listarProductosAdmin);
 
 // Pantalla para agregar productos
 router.get('/admin/productos/alta', (req, res) => {
@@ -44,16 +44,30 @@ router.get('/admin/productos/alta', (req, res) => {
 router.post('/admin/productos/alta', productoController.agregarProducto);
 
 // Pantalla para eliminar productos
-router.get('/admin/productos/eliminar', async (req, res) => {
-    const productos = await require('../models/productoModel').findAll();
+router.get('/admin/productos/darBaja', async (req, res) => {
+    const productos = await require('../models/productoModel').findAll({where: {activo: true}});
 
-    res.render('eliminarProducto', {
+    res.render('darBajaProducto', {
         productos: productos
     });
 });
 
 // Eliminar producto seleccionado
-router.post('/admin/productos/eliminar/:id', productoController.eliminarProducto);
+router.post('/admin/productos/darBaja/:id', productoController.darBajaProducto);
+
+// Reactivar un producto
+router.post('/admin/productos/reactivar/:id', productoController.reactivarProducto);
+
+// Pantalla para reactivar productos
+router.get('/admin/productos/reactivar', async (req, res) => {
+    const productos = await require('../models/productoModel').findAll({
+        where: { activo: false }
+    });
+
+    res.render('reactivarProducto', {
+        productos: productos
+    });
+});
 
 // Ruta de API (Manejo de respuestas en JSON)
 router.get('/api/productos', productoController.listarJSON);
