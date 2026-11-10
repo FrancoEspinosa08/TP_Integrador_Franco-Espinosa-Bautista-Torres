@@ -1,17 +1,3 @@
-function continuarAProductos() {
-    const nombre = document.getElementById("nombre-cliente").value;
-
-    if (nombre.trim() === "") {
-        alert("Por favor, ingrese su nombre.");
-        return;
-    }
-
-    sessionStorage.setItem("nombreCliente", nombre);
-
-    window.location.href = "/productos";
-}
-
-// Catálogo de productos del kiosco tecnológico
 let productosDisponibles = [];
 
 async function cargarProductos() {
@@ -22,29 +8,28 @@ async function cargarProductos() {
         if (respuesta.ok && resultado.success) {
             productosDisponibles = resultado.data;
             renderizarProductos(productosDisponibles);
-        } else {
-            console.log("Error al cargar los productos");
         }
     } catch (error) {
         console.log("Error de conexión:", error);
     }
 }
 
-// Estado del carrito de compras
 let carritoCompras = [];
 
-// Función para renderizar tarjetas de productos en el catálogo
 function renderizarProductos(productosAMostrar) {
     const grilla = document.getElementById("grilla-productos");
+    if (!grilla) return;
     grilla.innerHTML = "";
 
     productosAMostrar.forEach(producto => {
         const tarjeta = document.createElement("div");
         tarjeta.className = "tarjeta-producto";
         tarjeta.innerHTML = `
+            <img src="${producto.imagen || 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=300'}" alt="${producto.nombre}" style="width: 100%; height: 140px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
             <div>
                 <h3>${producto.nombre}</h3>
                 <p class="precio-producto">$${producto.precio.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</p>
+                <small style="color: #666;">Stock: ${producto.stock}</small>
             </div>
             <button class="btn-agregar" onclick="agregarAlCarrito(${producto.id})">Agregar</button>
         `;
@@ -52,10 +37,9 @@ function renderizarProductos(productosAMostrar) {
     });
 }
 
-// Función para filtrar productos por tipo
 function filtrarProductos(categoria, evento) {
     document.querySelectorAll('.btn-categoria').forEach(btn => btn.classList.remove('activo'));
-    evento.target.classList.add('activo');
+    if(evento) evento.target.classList.add('activo');
 
     if (categoria === 'todos') {
         renderizarProductos(productosDisponibles);
@@ -65,13 +49,17 @@ function filtrarProductos(categoria, evento) {
     }
 }
 
-// Función para agregar ítems al carrito
 function agregarAlCarrito(idProducto) {
     const productoEncontrado = productosDisponibles.find(prod => prod.id === idProducto);
     const itemExistente = carritoCompras.find(item => item.id === idProducto);
 
     if (itemExistente) {
-        itemExistente.cantidad += 1;
+        if (itemExistente.cantidad < productoEncontrado.stock) {
+            itemExistente.cantidad += 1;
+        } else {
+            alert("No hay más stock disponible para este producto.");
+            return;
+        }
     } else {
         carritoCompras.push({
             id: productoEncontrado.id,
@@ -84,7 +72,6 @@ function agregarAlCarrito(idProducto) {
     actualizarVistaCarrito();
 }
 
-// Función para quitar productos del carrito
 function quitarDelCarrito(idProducto) {
     const itemExistente = carritoCompras.find(item => item.id === idProducto);
     if (itemExistente.cantidad > 1) {
@@ -95,10 +82,10 @@ function quitarDelCarrito(idProducto) {
     actualizarVistaCarrito();
 }
 
-// Función para actualizar el panel lateral del carrito
 function actualizarVistaCarrito() {
     const contenedorCarrito = document.getElementById("lista-carrito");
     const etiquetaTotal = document.getElementById("precio-total");
+    if (!contenedorCarrito) return;
 
     if (carritoCompras.length === 0) {
         contenedorCarrito.innerHTML = `<p style="color: #64748b; text-align: center; margin-top: 2rem;">El carrito está vacío</p>`;
@@ -129,7 +116,6 @@ function actualizarVistaCarrito() {
     etiquetaTotal.textContent = `$${sumaTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
 }
 
-// Función para procesar y emitir el ticket de compra
 function finalizarCompra() {
     if (carritoCompras.length === 0) {
         alert("Debe agregar al menos un producto para finalizar la compra.");
@@ -149,12 +135,12 @@ function finalizarCompra() {
     document.getElementById("modal-ticket").style.display = "flex";
 }
 
-// Función para reiniciar el kiosco de autoservicio
 function reiniciarKiosco() {
     carritoCompras = [];
     actualizarVistaCarrito();
     document.getElementById("modal-ticket").style.display = "none";
 }
 
-// Inicializar la grilla de productos al cargar el script
-cargarProductos();
+if (document.getElementById("grilla-productos")) {
+    cargarProductos();
+}

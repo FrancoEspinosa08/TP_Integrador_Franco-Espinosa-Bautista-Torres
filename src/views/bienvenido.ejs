@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,18 +9,29 @@
 <body>
 
     <div class="pantalla-bienvenida">
-
         <h1>Bienvenido al Kiosco Tecnológico</h1>
-
         <p>Ingrese su nombre para comenzar su compra</p>
 
         <input type="text" id="nombre-cliente" placeholder="Ingrese su nombre">
 
         <button onclick="continuarAProductos()">Continuar</button>
 
+        <!-- Botón solicitado para ingresar directo como Administrador -->
+        <button onclick="window.location.href='/admin/login'" style="background-color: #475569; margin-top: 15px;">
+            Ingresar como Administrador
+        </button>
     </div>
 
-    <script src="/js/script.js"></script>
-
+    <script>
+        function continuarAProductos() {
+            const nombre = document.getElementById("nombre-cliente").value;
+            if (nombre.trim() === "") {
+                alert("Por favor, ingrese su nombre.");
+                return;
+            }
+            sessionStorage.setItem("nombreCliente", nombre);
+            window.location.href = "/productos";
+        }
+    </script>
 </body>
 </html>

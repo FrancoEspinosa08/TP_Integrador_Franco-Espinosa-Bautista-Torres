@@ -1,24 +1,23 @@
 const Producto = require('../models/productoModel');
 
 const productoController = {
-    // Renderiza la vista EJS trayendo los datos de Sequelize
+    // Listar catálogo para clientes (solo productos activos)
     listarCatalogo: async (req, res) => {
         try {
-            let productos = await Producto.findAll();
+            let productos = await Producto.findAll({ where: { activo: true } });
             
-            // Si la base de datos está vacía, inserta los productos por defecto de tu kiosco
             if (productos.length === 0) {
                 await Producto.bulkCreate([
-                    { nombre: "Auriculares In-Ear con Micrófono", tipo: "perifericos", precio: 8500.00 },
-                    { nombre: "Cable USB-C Carga Rápida 1m", tipo: "perifericos", precio: 4200.00 },
-                    { nombre: "Adaptador Multiport USB-C a HDMI", tipo: "perifericos", precio: 18900.00 },
-                    { nombre: "Pendrive USB 3.0 64GB", tipo: "perifericos", precio: 9500.00 },
-                    { nombre: "Mousepad Gaming XL Borde Cosido", tipo: "escritorio", precio: 11000.00 },
-                    { nombre: "Soporte de Aluminio Plegable Celular", tipo: "escritorio", precio: 7800.00 },
-                    { nombre: "Organizador de Cables Silicona", tipo: "escritorio", precio: 3500.00 },
-                    { nombre: "Lámpara LED de Escritorio USB", tipo: "escritorio", precio: 14500.00 }
+                    { nombre: "Auriculares In-Ear con Micrófono", tipo: "perifericos", precio: 8500.00, stock: 15, imagen: "/img/AuricularesInEarConMicrofono.jpg", activo: true },
+                    { nombre: "Cable USB-C Carga Rápida", tipo: "perifericos", precio: 4200.00, stock: 30, imagen: "/img/CableUsbCCargaRápida.webp", activo: true },
+                    { nombre: "Adaptador USB-C a HDMI", tipo: "perifericos", precio: 18900.00, stock: 10, imagen: "/img/AdaptadorUsbCAHdmi.webp", activo: true },
+                    { nombre: "Pendrive USB-C 64GB", tipo: "perifericos", precio: 9500.00, stock: 25, imagen: "/img/PendriveUsbC64gb.jpg", activo: true },
+                    { nombre: "Mousepad", tipo: "escritorio", precio: 11000.00, stock: 20, imagen: "/img/Mousepad.jpg", activo: true },
+                    { nombre: "Soporte Aluminio Plegable", tipo: "escritorio", precio: 7800.00, stock: 12, imagen: "/img/SoporteAluminioPlegable.webp", activo: true },
+                    { nombre: "Organizador de cables", tipo: "escritorio", precio: 3500.00, stock: 40, imagen: "/img/Organizador De Cables.webp", activo: true },
+                    { nombre: "Lámpara LED Escritorio USB", tipo: "escritorio", precio: 14500.00, stock: 8, imagen: "/img/LamparaLedEscritorioUSB.jpg", activo: true }
                 ]);
-                productos = await Producto.findAll();
+                productos = await Producto.findAll({ where: { activo: true } });
             }
 
             res.render('index', { productosDisponibles: productos });
@@ -28,60 +27,125 @@ const productoController = {
         }
     },
 
-    // Respuesta en JSON para cumplir con el requerimiento de API
     listarJSON: async (req, res) => {
         try {
-            const productos = await Producto.findAll();
+            const productos = await Producto.findAll({ where: { activo: true } });
             res.json({ success: true, data: productos });
         } catch (error) {
             res.status(500).json({ success: false, message: error.message });
         }
     },
+
     agregarProducto: async (req, res) => {
         try {
-            const nombre = req.body.nombre;
-            const tipo = req.body.tipo;
-            const precio = req.body.precio;
+            const { nombre, tipo, precio, stock, imagen } = req.body;
+            let stockNum = parseInt(stock) || 10;
+            
+            // Regla de negocio: Si se crea con stock 0, nace inactivo
+            let esActivo = stockNum > 0;
 
             await Producto.create({
-                nombre: nombre,
-                tipo: tipo,
-                precio: precio
+                nombre,
+                tipo,
+                precio,
+                stock: stockNum,
+                imagen: imagen || '/img/default.png',
+                activo: esActivo
             });
-
             res.redirect('/admin/productos');
-
         } catch (error) {
             console.error(error);
             res.status(500).send("Error al agregar el producto");
         }
     },
+
     listarProductosAdmin: async (req, res) => {
-    try {
-        const productos = await Producto.findAll();
-
-        res.render('dashboard', {
-            productos: productos
-        });
-
+        try {
+            // El admin ve todos (activos e inactivos para poder reactivarlos)
+            const productos = await Producto.findAll();
+            res.render('dashboardProductos', { productos });
         } catch (error) {
             console.error(error);
-            res.status(500).send("Error al cargar los productos");
+            res.status(500).send("Error al cargar los productos del administrador");
         }
     },
-    eliminarProducto: async (req, res) => {
-        try {
-            const id = req.params.id;
 
-            await Producto.destroy({
-                where: { id: id }
+    // Formulario de edición
+    formEditarProducto: async (req, res) => {
+        try {
+            const producto = await Producto.findByPk(req.params.id);
+            res.render('editarProducto', { producto });
+        } catch (error) {
+            res.status(500).send("Error al cargar el producto para editar");
+        }
+    },
+
+    // Actualizar producto (imagen, precio, stock y regla de stock <= 0)
+    actualizarProducto: async (req, res) => {
+        try {
+            const { nombre, tipo, precio, stock, imagen } = req.body;
+            let stockNum = parseInt(stock);
+
+            // Validación: Si el stock es 0 o menor, se fuerza a 0 y se da de baja lógica (activo: false)
+            let nuevoActivo = true;
+            if (stockNum <= 0) {
+                stockNum = 0;
+                nuevoActivo = false;
+            }
+
+            await Producto.update({
+                nombre,
+                tipo,
+                precio,
+                stock: stockNum,
+                imagen,
+                activo: nuevoActivo
+            }, {
+                where: { id: req.params.id }
             });
 
-            res.redirect('/admin/productos/eliminar');
-
+            res.redirect('/admin/productos');
         } catch (error) {
             console.error(error);
-            res.status(500).send("Error al eliminar el producto");
+            res.status(500).send("Error al actualizar el producto");
+        }
+    },
+
+    // Baja lógica / Reactivación (cambiar activo a false/true)
+    cambiarEstadoProducto: async (req, res) => {
+        try {
+            const producto = await Producto.findByPk(req.params.id);
+            if (producto) {
+                const nuevoEstado = !producto.activo; // Alterna entre true y false
+                producto.activo = nuevoEstado;
+
+                // Si se da de alta (true) y su stock es 0, se fuerza a 1 automáticamente
+                if (nuevoEstado && producto.stock <= 0) {
+                    producto.stock = 1;
+                }
+
+                await producto.save();
+            }
+            res.redirect('/admin/productos');
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Error al cambiar el estado del producto");
+        }
+    },
+
+    validarLoginAdmin: async (req, res) => {
+        const { correo, contrasena } = req.body;
+
+        if (correo === "admin@gmail.com" && contrasena === "1234") {
+            try {
+                const productos = await Producto.findAll();
+                res.render('dashboardProductos', { productos });
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("Error al cargar el panel de administración");
+            }
+        } else {
+            res.send("Correo o contraseña incorrectos.");
         }
     }
 };

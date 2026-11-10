@@ -2,60 +2,50 @@ const express = require('express');
 const router = express.Router();
 const productoController = require('../controllers/productoControllers');
 
-// Ruta principal (SSR con EJS)
+// Ruta principal
 router.get('/', (req, res) => {
     res.render('bienvenido');
 });
 
-// Catálogo de productos para clientes
+// Catálogo para clientes
 router.get('/productos', productoController.listarCatalogo);
 
-// Login del administrador
+// Login Admin
 router.get('/admin/login', (req, res) => {
     res.render('login');
 });
 
+// Validación del login (Redirige obligatoriamente al controlador de productos)
 // Validación del login
 router.post('/admin/login', (req, res) => {
     const correo = req.body.correo;
     const contrasena = req.body.contrasena;
 
     if (correo === "admin@gmail.com" && contrasena === "1234") {
-        res.render("dashboard");
+        res.redirect('/admin/productos'); // <--- CAMBIAR res.render("dashboard") POR ESTO
     } else {
         res.send("Correo o contraseña incorrectos.");
     }
 });
 
-// Panel de administración
+// Redirigir el dashboard general a la gestión de productos
 router.get('/admin/dashboard', (req, res) => {
-    res.render('dashboard');
+    res.redirect('/admin/productos');
 });
 
-// Ver productos del administrador
-router.get('/admin/productos', productoController.listarCatalogo);
-
-// Pantalla para agregar productos
-router.get('/admin/productos/alta', (req, res) => {
-    res.render('altaProducto');
-});
-
-// Guardar producto nuevo
+// Gestión de productos Admin (Carga la vista con la variable productos asegurada)
+router.get('/admin/productos', productoController.listarProductosAdmin);
+router.get('/admin/productos/alta', (req, res) => { res.render('altaProducto'); });
 router.post('/admin/productos/alta', productoController.agregarProducto);
 
-// Pantalla para eliminar productos
-router.get('/admin/productos/eliminar', async (req, res) => {
-    const productos = await require('../models/productoModel').findAll();
+// Editar producto
+router.get('/admin/productos/editar/:id', productoController.formEditarProducto);
+router.post('/admin/productos/editar/:id', productoController.actualizarProducto);
 
-    res.render('eliminarProducto', {
-        productos: productos
-    });
-});
+// Baja lógica / Reactivación
+router.post('/admin/productos/estado/:id', productoController.cambiarEstadoProducto);
 
-// Eliminar producto seleccionado
-router.post('/admin/productos/eliminar/:id', productoController.eliminarProducto);
-
-// Ruta de API (Manejo de respuestas en JSON)
+// API JSON
 router.get('/api/productos', productoController.listarJSON);
 
 module.exports = router;
