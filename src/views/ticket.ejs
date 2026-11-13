@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket de Compra</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body class="pagina-ticket">
+
+    <div class="contenedor-ticket">
+        <div class="contenido-ticket">
+            <div class="encabezado-ticket">
+                <h1>¡Compra exitosa!</h1>
+                <p>Gracias por tu compra</p>
+                <h2>COMPROBANTE DE COMPRA</h2>
+            </div>
+
+            <div class="datos-ticket">
+                <p><strong>Cliente:</strong> <%= ticket.nombre %></p>
+                <p><strong>Fecha:</strong> <%= ticket.fecha %></p>
+                <p><strong>Empresa:</strong> <%= ticket.empresa %></p>
+            </div>
+
+            <div class="ticket-detalle">
+                <% ticket.productos.forEach(producto => { %>
+                    <div class="item-ticket">
+                        <span><%= producto.cantidad %> x <%= producto.nombre %></span>
+                        <strong>$<%= (producto.precio * producto.cantidad).toLocaleString('es-AR') %></strong>
+                    </div>
+                <% }) %>
+            </div>
+
+            <div class="total-ticket">
+                TOTAL: $<%= ticket.total.toLocaleString('es-AR', { minimumFractionDigits: 2 }) %>
+            </div>
+
+        </div>
+
+        <div class="acciones-ticket">
+
+            <a href="/compra/pdf" class="btn-descargar-ticket">
+                Descargar ticket PDF
+            </a>
+
+            <button class="btn-nueva-compra" onclick="window.location.href='/'">
+                Nueva compra
+            </button>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -48,4 +48,13 @@ router.post('/admin/productos/estado/:id', productoController.cambiarEstadoProdu
 // API JSON
 router.get('/api/productos', productoController.listarJSON);
 
+// Compra del cliente
+router.post('/compra', productoController.procesarCompra);
+
+// Mostrar ticket de compra
+router.get('/compra/ticket', productoController.mostrarTicket);
+
+// Descargar ticket en PDF
+router.get('/compra/pdf', productoController.generarPDF);
+
 module.exports = router;

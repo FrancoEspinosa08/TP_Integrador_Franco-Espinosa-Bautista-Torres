@@ -116,31 +116,61 @@ function actualizarVistaCarrito() {
     etiquetaTotal.textContent = `$${sumaTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
 }
 
-function finalizarCompra() {
+async function finalizarCompra() {
     if (carritoCompras.length === 0) {
         alert("Debe agregar al menos un producto para finalizar la compra.");
         return;
     }
 
-    const fechaActual = new Date().toLocaleString('es-AR');
-    let sumaTotal = carritoCompras.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
-    
-    let detalleTexto = `FECHA: ${fechaActual}<br>----------------------------------------<br>`;
-    carritoCompras.forEach(item => {
-        detalleTexto += `${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toLocaleString('es-AR')}<br>`;
-    });
-    detalleTexto += `----------------------------------------<br><strong>TOTAL: $${sumaTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</strong>`;
+    const nombre = sessionStorage.getItem("nombreCliente");
 
-    document.getElementById("ticket-detalle").innerHTML = detalleTexto;
-    document.getElementById("modal-ticket").style.display = "flex";
+    try {
+        const respuesta = await fetch('/compra', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nombre: nombre,
+                productos: carritoCompras
+            })
+        });
+
+        const resultado = await respuesta.json();
+
+        if (respuesta.ok && resultado.success) {
+            window.location.href = '/compra/ticket';
+        } else {
+            alert("No se pudo finalizar la compra.");
+        }
+
+    } catch (error) {
+        console.log("Error al finalizar la compra:", error);
+        alert("Error de conexión con el servidor.");
+    }
 }
 
 function reiniciarKiosco() {
     carritoCompras = [];
     actualizarVistaCarrito();
-    document.getElementById("modal-ticket").style.display = "none";
+    window.location.href = "/";
 }
 
 if (document.getElementById("grilla-productos")) {
     cargarProductos();
+}
+
+function mostrarNombreCliente(){
+    const nombre = sessionStorage.getItem("nombreCliente");
+
+    document.getElementById("nombre-cliente").textContent = "Cliente: " + nombre;
+}
+
+function salirCliente(){
+    sessionStorage.removeItem("nombreCliente");
+    window.location.href = "/";
+}
+
+if (document.getElementById("nombre-cliente")) {
+    mostrarNombreCliente();
 }

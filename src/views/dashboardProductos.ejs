@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,37 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Productos - Admin</title>
     <link rel="stylesheet" href="/css/style.css">
-    <style>
-        .tarjeta-producto-activa {
-            border: 1px solid #cbd5e1;
-            background-color: #ffffff;
-        }
-
-        .tarjeta-producto-inactiva {
-            border: 1px solid #f87171;
-            background-color: #fef2f2;
-        }
-
-        .btn-accion-rojo {
-            width: 100%;
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 6px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .btn-accion-verde {
-            width: 100%;
-            background: #16a34a;
-            color: white;
-            border: none;
-            padding: 6px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
 
@@ -43,44 +13,69 @@
         <h1>Panel de Administración - Productos</h1>
     </header>
 
-    <div class="contenedor-principal" style="padding: 20px;">
-        <div class="seccion-catalogo" style="width: 100%;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div class="contenedor-principal">
+        <div class="seccion-catalogo admin-productos">
+
+            <div class="encabezado-admin-productos">
                 <h2>Lista de Productos</h2>
-                <div>
-                    <button onclick="window.location.href='/admin/productos/alta'" style="padding: 10px 15px; background: #2563eb; color: #fff; border: none; border-radius: 5px; cursor: pointer;">+ Nuevo Producto</button>
-                    <button onclick="window.location.href='/admin/dashboard'" style="padding: 10px 15px; background: #64748b; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Volver al Panel</button>
+
+                <div class="botones-admin">
+                    <button class="btn-nuevo-producto" onclick="window.location.href='/admin/productos/alta'">
+                        + Nuevo Producto
+                    </button>
+
+                    <button class="btn-volver-admin" onclick="window.location.href='/'">
+                        Volver al Panel
+                    </button>
                 </div>
             </div>
 
             <div class="grilla-productos">
-                <% productos.forEach((producto) => { 
-                    // Evaluamos la lógica fuera del HTML para que el linter de CSS no falle
+                <% productos.forEach((producto) => {
                     const claseTarjeta = producto.activo ? 'tarjeta-producto-activa' : 'tarjeta-producto-inactiva';
                     const claseBtn = producto.activo ? 'btn-accion-rojo' : 'btn-accion-verde';
                     const textoBtn = producto.activo ? 'Dar de baja' : 'Activar';
                     const estadoTexto = producto.activo ? 'Activo' : 'Dado de baja';
                 %>
+
                     <div class="tarjeta-producto <%= claseTarjeta %>">
-                        <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>" style="width: 100%; height: 120px; object-fit: cover; border-radius: 4px;">
+
+                        <img class="imagen-producto-admin" src="<%= producto.imagen %>" alt="<%= producto.nombre %>">
+
                         <div>
                             <h3><%= producto.nombre %></h3>
-                            <p class="precio-producto">$<%= producto.precio.toLocaleString('es-AR') %></p>
-                            <p><small>Stock: <%= producto.stock %> | Estado: <strong><%= estadoTexto %></strong></small></p>
+
+                            <p class="precio-producto">
+                                $<%= producto.precio.toLocaleString('es-AR') %>
+                            </p>
+
+                            <p>
+                                <small>
+                                    Stock: <%= producto.stock %> |
+                                    Estado: <strong><%= estadoTexto %></strong>
+                                </small>
+                            </p>
                         </div>
 
-                        <div style="display: flex; gap: 5px; margin-top: 10px;">
-                            <button onclick="window.location.href='/admin/productos/editar/<%= producto.id %>'" style="flex: 1; background: #0284c7; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer;">Editar</button>
+                        <div class="botones-acciones-producto">
 
-                            <form action="/admin/productos/estado/<%= producto.id %>" method="POST" style="flex: 1;">
+                            <button class="btn-editar-producto" onclick="window.location.href='/admin/productos/editar/<%= producto.id %>'">
+                                Editar
+                            </button>
+
+                            <form action="/admin/productos/estado/<%= producto.id %>" method="POST">
                                 <button type="submit" class="<%= claseBtn %>">
                                     <%= textoBtn %>
                                 </button>
                             </form>
+
                         </div>
+
                     </div>
+
                 <% }) %>
             </div>
+
         </div>
     </div>
 

@@ -287,6 +287,219 @@ header h1 {
     background-color: var(--color-secundario);
 }
 
+.usuario-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.usuario-header button {
+    background-color: white;
+    color: var(--color-primario);
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.usuario-header button:hover {
+    background-color: var(--color-gris);
+}
+
+/* PANEL DE ADMINISTRACIÓN - PRODUCTOS /DashboardProducto.ejs */
+
+.tarjeta-producto-activa {
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+}
+
+.tarjeta-producto-inactiva {
+    border: 1px solid #f87171;
+    background-color: #fef2f2;
+}
+
+.btn-accion-rojo {
+    width: 100%;
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-accion-verde {
+    width: 100%;
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.contenedor-admin-productos {
+    padding: 20px;
+    width: 100%;
+}
+
+.encabezado-admin-productos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.botones-admin {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-nuevo-producto {
+    padding: 10px 15px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-volver-admin {
+    padding: 10px 15px;
+    background: #64748b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.imagen-producto-admin {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.botones-acciones-producto {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.btn-editar-producto {
+    flex: 1;
+    background: #0284c7;
+    color: white;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* TICKET DE COMPRA */
+
+.pagina-ticket {
+    min-height: 100vh;
+    height: auto;
+    overflow-y: auto;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 15px;
+}
+
+.contenedor-ticket {
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+}
+
+.contenido-ticket {
+    background-color: #ffffff;
+    border: 2px solid #2563eb;
+    border-radius: 14px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+}
+
+.encabezado-ticket {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.encabezado-ticket h1 {
+    color: #2563eb;
+    margin-bottom: 8px;
+}
+
+.encabezado-ticket h2 {
+    margin-top: 20px;
+    color: #1e40af;
+}
+
+.datos-ticket {
+    margin-bottom: 20px;
+    line-height: 1.8;
+}
+
+.ticket-detalle {
+    border-top: 1px dashed #2563eb;
+    border-bottom: 1px dashed #2563eb;
+    padding: 15px 0;
+}
+
+.item-ticket {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+.total-ticket {
+    text-align: right;
+    color: #1e40af;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.acciones-ticket {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.btn-descargar-ticket,
+.btn-nueva-compra {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-descargar-ticket {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+.btn-nueva-compra {
+    background-color: #ffffff;
+    color: #2563eb;
+    border: 2px solid #2563eb;
+}
+
+.btn-descargar-ticket:hover {
+    background-color: #1e40af;
+}
+
+.btn-nueva-compra:hover {
+    background-color: #eff6ff;
+}
 
 /* Diseño Responsive para móviles */
 @media (max-width: 768px) {

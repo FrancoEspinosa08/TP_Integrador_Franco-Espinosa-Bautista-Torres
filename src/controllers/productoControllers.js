@@ -1,4 +1,7 @@
 const Producto = require('../models/productoModel');
+const PDFDocument = require('pdfkit');
+
+let ultimoTicket = null;
 
 const productoController = {
     // Listar catálogo para clientes (solo productos activos)
@@ -131,6 +134,84 @@ const productoController = {
             console.error(error);
             res.status(500).send("Error al cambiar el estado del producto");
         }
+    },
+
+    procesarCompra: async (req, res) => {
+        try {
+            const { nombre, productos } = req.body;
+
+            if (!nombre || !productos || productos.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Datos de compra incompletos."
+                });
+            }
+
+            let total = 0;
+
+            productos.forEach(producto => {
+                total += producto.precio * producto.cantidad;
+            });
+
+            const fecha = new Date().toLocaleString('es-AR');
+
+            ultimoTicket = {
+                nombre, productos, total, fecha, empresa: "Kiosco Tecnologico"
+            };
+
+            res.json({
+                success: true
+            });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({
+                success: false,
+                message: "Error al procesar la compra."
+            });
+        }
+    },
+
+    mostrarTicket: (req, res) => {
+        if (!ultimoTicket) {
+            return res.redirect('/productos');
+        }
+
+        res.render('ticket', { ticket: ultimoTicket });
+    },
+
+    generarPDF: (req, res) => {
+        if (!ultimoTicket) {
+            return res.redirect('/productos');
+        }
+
+        const doc = new PDFDocument();
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=ticket.pdf');
+
+        doc.pipe(res);
+
+        doc.fontSize(20).text('TICKET DE COMPRA', { align: 'center' });
+        doc.moveDown();
+
+        doc.fontSize(14).text('Kiosco Tecnologico', {align: 'center'});
+
+        doc.fontSize(12).text('Cliente: ' + ultimoTicket.nombre);
+        doc.text('Fecha: ' + ultimoTicket.fecha);
+        doc.moveDown();
+
+        ultimoTicket.productos.forEach(producto => {
+            doc.text(
+                producto.cantidad + ' x ' + producto.nombre +
+                ' - $' + (producto.precio * producto.cantidad).toFixed(2)
+            );
+        });
+
+        doc.moveDown();
+        doc.fontSize(16).text('TOTAL: $' + ultimoTicket.total.toFixed(2));
+
+        doc.end();
     },
 
     validarLoginAdmin: async (req, res) => {

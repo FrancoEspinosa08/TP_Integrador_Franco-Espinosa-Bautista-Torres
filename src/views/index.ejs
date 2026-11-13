@@ -11,7 +11,11 @@
     <!-- Encabezado de la Terminal de Autoservicio -->
     <header>
         <h1>Terminal de Autoservicio - Kiosco Tecnológico</h1>
-        <span id="reloj"></span>
+        <div class="usuario-header">
+                <span id="nombre-cliente"></span>
+                <button onclick="salirCliente()">Salir</button>
+        </div>
+            
     </header>
 
     <!-- Contenedor Principal dividido en Catálogo y Carrito -->
@@ -49,18 +53,6 @@
             </div>
         </div>
 
-    </div>
-
-    <!-- Modal del Ticket de Compra -->
-    <div id="modal-ticket" class="modal">
-        <div class="contenido-modal">
-            <h2>¡Compra Exitosa!</h2>
-            <p>Retire su ticket a continuación:</p>
-            <div id="ticket-detalle" class="ticket-detalle">
-                <!-- Detalle del ticket generado por JavaScript -->
-            </div>
-            <button class="btn-cerrar-modal" onclick="reiniciarKiosco()">Nueva Compra</button>
-        </div>
     </div>
 
     <script src="/js/script.js"></script>

@@ -34,7 +34,7 @@ const Producto = sequelize.define('Producto', {
                 msg: "El stock no puede ser negativo."
             }
         }
-    }, // <--- Acá estaba el detalle de la coma que faltaba separar de la siguiente propiedad
+    },
     activo: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
@@ -44,7 +44,5 @@ const Producto = sequelize.define('Producto', {
     tableName: 'productos',
     timestamps: false
 });
-
-module.exports = Producto;
 
 module.exports = Producto;
