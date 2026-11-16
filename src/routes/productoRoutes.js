@@ -1,60 +1,70 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const productoController = require('../controllers/productoControllers');
 
-// Ruta principal
+// Importamos el middleware de protección JWT
+const verificarToken = require('../middlewares/authMiddlewares');
+
+// Configuración de multer para las imágenes
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/img/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
+
+// --- RUTAS PÚBLICAS (No piden token) ---
 router.get('/', (req, res) => {
     res.render('bienvenido');
 });
 
-// Catálogo para clientes
 router.get('/productos', productoController.listarCatalogo);
 
-// Login Admin
 router.get('/admin/login', (req, res) => {
     res.render('login');
 });
 
-// Validación del login (Redirige obligatoriamente al controlador de productos)
-// Validación del login
-router.post('/admin/login', (req, res) => {
-    const correo = req.body.correo;
-    const contrasena = req.body.contrasena;
+router.post('/admin/login', productoController.validarLoginAdmin);
 
-    if (correo === "admin@gmail.com" && contrasena === "1234") {
-        res.redirect('/admin/productos'); // <--- CAMBIAR res.render("dashboard") POR ESTO
-    } else {
-        res.send("Correo o contraseña incorrectos.");
-    }
-});
+router.get('/api/productos', productoController.listarJSON);
 
-// Redirigir el dashboard general a la gestión de productos
-router.get('/admin/dashboard', (req, res) => {
+router.post('/compra', productoController.procesarCompra);
+router.get('/compra/ticket', productoController.mostrarTicket);
+router.get('/compra/pdf', productoController.generarPDF);
+
+
+// --- RUTAS PROTEGIDAS (Exigen el token JWT mediante 'verificarToken') ---
+
+// Redirigir el dashboard general a la gestión de productos de forma segura
+router.get('/admin/dashboard', verificarToken, (req, res) => {
     res.redirect('/admin/productos');
 });
 
-// Gestión de productos Admin (Carga la vista con la variable productos asegurada)
-router.get('/admin/productos', productoController.listarProductosAdmin);
-router.get('/admin/productos/alta', (req, res) => { res.render('altaProducto'); });
-router.post('/admin/productos/alta', productoController.agregarProducto);
+// Listar productos en el panel de control
+router.get('/admin/productos', verificarToken, productoController.listarProductosAdmin);
 
-// Editar producto
-router.get('/admin/productos/editar/:id', productoController.formEditarProducto);
-router.post('/admin/productos/editar/:id', productoController.actualizarProducto);
+// Formulario de alta y procesamiento de nuevo producto
+router.get('/admin/productos/alta', verificarToken, (req, res) => { 
+    res.render('altaProducto'); 
+});
+router.post('/admin/productos/alta', verificarToken, upload.single('imagenArchivo'), productoController.agregarProducto);
 
-// Baja lógica / Reactivación
-router.post('/admin/productos/estado/:id', productoController.cambiarEstadoProducto);
+// Formulario de edición y procesamiento de actualización de producto
+router.get('/admin/productos/editar/:id', verificarToken, productoController.formEditarProducto);
+router.post('/admin/productos/editar/:id', verificarToken, upload.single('imagenArchivo'), productoController.actualizarProducto);
 
-// API JSON
-router.get('/api/productos', productoController.listarJSON);
+// Cambio de estado (Baja lógica / Reactivación)
+router.post('/admin/productos/estado/:id', verificarToken, productoController.cambiarEstadoProducto);
 
-// Compra del cliente
-router.post('/compra', productoController.procesarCompra);
-
-// Mostrar ticket de compra
-router.get('/compra/ticket', productoController.mostrarTicket);
-
-// Descargar ticket en PDF
-router.get('/compra/pdf', productoController.generarPDF);
+// Ruta para cerrar sesión del admin
+router.get('/admin/logout', (req, res) => {
+    res.clearCookie('tokenAdmin');
+    res.redirect('/admin/login');
+});
 
 module.exports = router;

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,6 +10,62 @@
 
     <header>
         <h1>Panel de Administración - Productos</h1>
+    <div class="admin-titulo">
+        <h2>Panel de Administración - Kiosco Tecnológico</h2>
+    </div>
+    
+    <div class="admin-user-info">
+        <span class="admin-badge">Admin</span>
+        <span id="reloj-admin" class="admin-reloj">--:--:--</span>
+        <a href="/admin/logout" class="btn-logout">Cerrar Sesión</a>
+    </div>
+
+<!-- Script para mostrar la hora en vivo -->
+            <script>
+    // 1. Configurar la duración exacta de la sesión: 2 horas en milisegundos (2 * 60 * 60 * 1000 = 7200000)
+    const TIEMPO_SESION = 2 * 60 * 60 * 1000; 
+
+    // 2. Control inteligente de sesión: Si venimos del login, forzamos un nuevo conteo de 2 horas.
+    // Usamos sessionStorage para que dure mientras la pestaña esté abierta.
+    let tiempoExpiracion = sessionStorage.getItem('tokenExpiry');
+    
+    // Si no existe o querés asegurarte de resetearlo al entrar al dashboard:
+    // (Opcional: podés limpiar el storage al loguearte desde el backend, pero acá lo controlamos)
+    if (!tiempoExpiracion) {
+        tiempoExpiracion = new Date().getTime() + TIEMPO_SESION;
+        sessionStorage.setItem('tokenExpiry', tiempoExpiracion);
+    }
+
+    function actualizarRelojYContador() {
+        const ahora = new Date().getTime();
+        const distancia = tiempoExpiracion - ahora;
+
+        // Si el tiempo llegó a cero o pasó
+        if (distancia <= 0) {
+            sessionStorage.removeItem('tokenExpiry');
+            window.location.href = '/admin/logout'; // Redirige al login de forma segura
+            return;
+        }
+
+        // Calcular horas, minutos y segundos restantes
+        const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
+        const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
+
+        // Formatear con ceros a la izquierda (ej: 02:00:00, 01:59:59)
+        const formatoContador = 
+            String(horas).padStart(2, '0') + ':' + 
+            String(minutos).padStart(2, '0') + ':' + 
+            String(segundos).padStart(2, '0');
+
+        // Mostrar en el header al lado del badge de admin
+        document.getElementById('reloj-admin').textContent = "Expira en: " + formatoContador;
+    }
+
+    // Ejecutar cada 1 segundo exacto
+    setInterval(actualizarRelojYContador, 1000);
+    actualizarRelojYContador();
+</script>
     </header>
 
     <div class="contenedor-principal">
@@ -30,51 +85,88 @@
                 </div>
             </div>
 
-            <div class="grilla-productos">
-                <% productos.forEach((producto) => {
-                    const claseTarjeta = producto.activo ? 'tarjeta-producto-activa' : 'tarjeta-producto-inactiva';
-                    const claseBtn = producto.activo ? 'btn-accion-rojo' : 'btn-accion-verde';
-                    const textoBtn = producto.activo ? 'Dar de baja' : 'Activar';
-                    const estadoTexto = producto.activo ? 'Activo' : 'Dado de baja';
-                %>
-
-                    <div class="tarjeta-producto <%= claseTarjeta %>">
-
-                        <img class="imagen-producto-admin" src="<%= producto.imagen %>" alt="<%= producto.nombre %>">
-
-                        <div>
-                            <h3><%= producto.nombre %></h3>
-
-                            <p class="precio-producto">
-                                $<%= producto.precio.toLocaleString('es-AR') %>
-                            </p>
-
-                            <p>
-                                <small>
-                                    Stock: <%= producto.stock %> |
-                                    Estado: <strong><%= estadoTexto %></strong>
-                                </small>
-                            </p>
-                        </div>
-
-                        <div class="botones-acciones-producto">
-
-                            <button class="btn-editar-producto" onclick="window.location.href='/admin/productos/editar/<%= producto.id %>'">
-                                Editar
-                            </button>
-
-                            <form action="/admin/productos/estado/<%= producto.id %>" method="POST">
-                                <button type="submit" class="<%= claseBtn %>">
-                                    <%= textoBtn %>
-                                </button>
-                            </form>
-
-                        </div>
-
-                    </div>
-
-                <% }) %>
+            <!-- Buscador por ID -->
+            <div class="buscador-container">
+                <form action="/admin/productos" method="GET" class="form-buscador">
+                    <input type="number" name="buscarId" placeholder="Buscar por ID (Ej. 3)" value="<%= buscarId %>" class="input-buscador" required>
+                    <button type="submit" class="btn-buscar">Buscar</button>
+                    <% if (buscarId) { %>
+                        <a href="/admin/productos" class="btn-limpiar">Limpiar</a>
+                    <% } %>
+                </form>
             </div>
+
+            <!-- Tabla de administración paginada -->
+            <div class="tabla-contenedor">
+                <table class="tabla-admin">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (productos && productos.length > 0) { %>
+                            <% productos.forEach((producto) => {
+                                const claseFila = producto.activo ? '' : 'fila-inactiva';
+                                const claseBtn = producto.activo ? 'btn-accion-rojo' : 'btn-accion-verde';
+                                const textoBtn = producto.activo ? 'Dar de baja' : 'Reactivar';
+                                const estadoTexto = producto.activo ? 'Activo' : 'Dado de baja';
+                            %>
+                                <tr class="<%= claseFila %>">
+                                    <td>#<%= producto.id %></td>
+                                    <td>
+                                        <img class="img-admin" src="<%= producto.imagen %>" alt="<%= producto.nombre %>">
+                                    </td>
+                                    <td class="nombre-producto"><%= producto.nombre %></td>
+                                    <td>$<%= producto.precio.toLocaleString('es-AR') %></td>
+                                    <td><%= producto.stock %></td>
+                                    <td><strong><%= estadoTexto %></strong></td>
+                                    <td>
+                                        <div class="acciones-container">
+                                            <button class="btn-editar-producto" onclick="window.location.href='/admin/productos/editar/<%= producto.id %>'">
+                                                Editar
+                                            </button>
+
+                                            <form action="/admin/productos/estado/<%= producto.id %>" method="POST" class="form-inline-admin">
+                                                <button type="submit" class="<%= claseBtn %>">
+                                                    <%= textoBtn %>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" class="text-center">No se encontró ningún producto con ese ID.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Controles de Paginación -->
+            <% if (totalPaginas > 1 && !buscarId) { %>
+                <div class="paginacion">
+                    <% if (paginaActual > 1) { %>
+                        <a href="/admin/productos?page=<%= paginaActual - 1 %>" class="btn-paginacion">Anterior</a>
+                    <% } %>
+
+                    <% for (let i = 1; i <= totalPaginas; i++) { %>
+                        <a href="/admin/productos?page=<%= i %>" class="btn-paginacion <%= paginaActual === i ? 'activo' : '' %>"><%= i %></a>
+                    <% } %>
+
+                    <% if (paginaActual < totalPaginas) { %>
+                        <a href="/admin/productos?page=<%= paginaActual + 1 %>" class="btn-paginacion">Siguiente</a>
+                    <% } %>
+                </div>
+            <% } %>
 
         </div>
     </div>

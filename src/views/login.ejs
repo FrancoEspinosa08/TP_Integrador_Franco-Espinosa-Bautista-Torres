@@ -9,25 +9,35 @@
 <body>
 
     <div class="pantalla-bienvenida">
-        <h1>Acceso Administrador</h1>
+        <div class="login-card-admin">
+            <h1>Acceso Administrador</h1>
 
-        <form action="/admin/login" method="POST">
-            <input
-                type="email"
-                name="correo"
-                placeholder="Correo electrónico"
-                required
-            >
+            <form action="/admin/login" method="POST" class="form-login-admin">
+                <div class="campo-login-grupo">
+                    <label for="correo">Correo electrónico</label>
+                    <input
+                        type="email"
+                        id="correo"
+                        name="correo"
+                        placeholder="admin@gmail.com"
+                        required
+                    >
+                </div>
 
-            <input
-                type="password"
-                name="contrasena"
-                placeholder="Contraseña"
-                required
-            >
+                <div class="campo-login-grupo">
+                    <label for="contrasena">Contraseña</label>
+                    <input
+                        type="password"
+                        id="contrasena"
+                        name="contrasena"
+                        placeholder="••••••••"
+                        required
+                    >
+                </div>
 
-            <button type="submit">Ingresar</button>
-        </form>
+                <button type="submit" class="btn-ingresar-admin">Ingresar</button>
+            </form>
+        </div>
     </div>
 
 </body>

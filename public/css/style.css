@@ -241,8 +241,7 @@ header h1 {
     margin-top: 1rem;
 }
 
-
-/* PANTALLA DE BIENVENIDA */
+/* PANTALLA DE BIENVENIDA Y LOGIN */
 .pantalla-bienvenida {
     display: flex;
     flex-direction: column;
@@ -250,40 +249,128 @@ header h1 {
     align-items: center;
     text-align: center;
     height: 100vh;
-    gap: 1.5rem;
     padding: 2rem;
+    background-color: var(--color-fondo);
+    gap: 1.2rem;
 }
 
 .pantalla-bienvenida h1 {
     color: var(--color-primario);
-    font-size: 2.5rem;
+    font-size: 2.2rem;
+    margin-bottom: 0.2rem;
 }
 
 .pantalla-bienvenida p {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    color: var(--color-texto);
+    margin-bottom: 0.5rem;
 }
 
+/* Estilos para el input y botones de la pantalla de bienvenida principal */
 .pantalla-bienvenida input {
     width: 100%;
     max-width: 350px;
-    padding: 1rem;
+    padding: 12px;
     border: 1px solid var(--color-gris);
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: var(--color-blanco);
+}
+
+.pantalla-bienvenida input:focus {
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .pantalla-bienvenida button {
     background-color: var(--color-primario);
     color: white;
     border: none;
-    padding: 1rem 2rem;
-    border-radius: 8px;
-    font-size: 1.1rem;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+    max-width: 350px;
 }
 
 .pantalla-bienvenida button:hover {
+    background-color: var(--color-secundario);
+}
+
+/* Tarjeta interna específica para el Login de Administrador */
+.login-card-admin {
+    background: var(--color-blanco);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left;
+}
+
+.login-card-admin h1 {
+    color: var(--color-primario);
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.form-login-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.campo-login-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campo-login-grupo label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-texto);
+}
+
+.campo-login-grupo input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-gris);
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.campo-login-grupo input:focus {
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.btn-ingresar-admin {
+    background-color: var(--color-primario);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.btn-ingresar-admin:hover {
     background-color: var(--color-secundario);
 }
 
@@ -512,4 +599,289 @@ header h1 {
     .seccion-carrito {
         max-height: 300px;
     }
+}
+
+/* Estilos para la tabla del panel de administración */
+.tabla-contenedor {
+    overflow-x: auto;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.tabla-admin {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tabla-admin th, .tabla-admin td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.tabla-admin th {
+    background-color: #f2f2f2;
+    border-bottom: 2px solid #ddd;
+}
+
+.fila-inactiva {
+    background-color: #f9f9f9;
+    color: #888;
+}
+
+.img-admin {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.acciones-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.form-inline-admin {
+    margin: 0;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Paginación */
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.btn-paginacion {
+    padding: 8px 14px;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    color: #333;
+}
+
+.btn-paginacion.activo {
+    background: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+/* Estilos para la vista de edición */
+.seccion-formulario-editar {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    max-width: 900px;
+    margin: 20px auto;
+}
+
+.encabezado-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.form-editar-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 30px;
+}
+
+.panel-previsualizacion {
+    text-align: center;
+    background: #fdfdfd;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    height: fit-content;
+}
+
+.contenedor-imagen-actual {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f1f1f1;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.img-preview-admin {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.panel-campos {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.campo-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.campo-grupo label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+.campo-grupo input, .campo-grupo select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.texto-ayuda {
+    font-size: 12px;
+    color: #666;
+}
+
+.botones-form-acciones {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-guardar {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-cancelar, .btn-volver {
+    background-color: #6c757d;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Estilos para el buscador por ID */
+.buscador-container {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+}
+
+.form-buscador {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.input-buscador {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 220px;
+    font-size: 14px;
+}
+
+.btn-buscar {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.btn-buscar:hover {
+    background-color: #0056b3;
+}
+
+.btn-limpiar {
+    padding: 8px 16px;
+    background-color: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.btn-limpiar:hover {
+    background-color: #5a6268;
+}
+
+/* Estilos para el Header del Administrador */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #212529;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+}
+
+.admin-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.admin-user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.admin-badge {
+    background-color: #007bff;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.admin-reloj {
+    font-family: monospace;
+    font-size: 14px;
+    color: #adb5bd;
+}
+
+.btn-logout {
+    background-color: #dc3545;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn-logout:hover {
+    background-color: #c82333;
 }

@@ -1,6 +1,10 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const app = express();
+
+// Modelos y asociaciones
+require('./src/models/asociaciones');
 const sequelize = require('./src/config/database');
 const productoRoutes = require('./src/routes/productoRoutes');
 
@@ -9,6 +13,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/views'));
 
 // 2. Middlewares
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'))); // Lee tu CSS y JS de cliente

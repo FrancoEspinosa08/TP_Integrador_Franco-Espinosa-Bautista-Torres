@@ -3,33 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Producto</title>
+    <title>Editar Producto - Admin</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
-    <div class="pantalla-bienvenida">
-        <h1>Editar Producto</h1>
+    <header>
+        <h1>Panel de Administración - Editar Producto</h1>
+    </header>
 
-        <form action="/admin/productos/editar/<%= producto.id %>" method="POST">
-            <input type="text" name="nombre" value="<%= producto.nombre %>" placeholder="Nombre" required>
+    <div class="contenedor-principal">
+        <div class="seccion-formulario-editar">
 
-            <select name="tipo" required>
-                <option value="perifericos" <%= producto.tipo === 'perifericos' ? 'selected' : '' %>>Periféricos</option>
-                <option value="escritorio" <%= producto.tipo === 'escritorio' ? 'selected' : '' %>>Escritorio</option>
-            </select>
+            <div class="encabezado-form">
+                <h2>Editando: <%= producto.nombre %></h2>
+                <a href="/admin/productos" class="btn-volver">← Volver al listado</a>
+            </div>
 
-            <input type="number" step="0.01" name="precio" value="<%= producto.precio %>" placeholder="Precio" required>
-            <input type="number" name="stock" value="<%= producto.stock %>" placeholder="Stock" required>
-            <input type="text" name="imagen" value="<%= producto.imagen %>" placeholder="URL de la imagen" required>
+            <form action="/admin/productos/editar/<%= producto.id %>" method="POST" enctype="multipart/form-data" class="form-editar-grid">
+                
+                <!-- Columna Izquierda: Vista previa de la imagen actual e información -->
+                <div class="panel-previsualizacion">
+                    <h3>Imagen Actual</h3>
+                    <div class="contenedor-imagen-actual">
+                        <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>" id="imgPreview" class="img-preview-admin">
+                    </div>
+                    <p><small>ID del producto: <strong>#<%= producto.id %></strong></small></p>
+                    <p><small>Estado actual: <strong><%= producto.activo ? 'Activo' : 'Inactivo' %></strong></small></p>
+                </div>
 
-            <button type="submit" style="background: #16a34a;">Guardar Cambios</button>
-        </form>
+                <!-- Columna Derecha: Campos a modificar de manera ordenada -->
+                <div class="panel-campos">
+                    
+                    <div class="campo-grupo">
+                        <label for="nombre">Nombre del producto:</label>
+                        <input type="text" id="nombre" name="nombre" value="<%= producto.nombre %>" required>
+                    </div>
 
-        <button onclick="window.location.href='/admin/productos'" style="margin-top: 10px; background-color: #64748b;">
-            Cancelar
-        </button>
+                    <div class="campo-grupo">
+                        <label for="tipo">Categoría / Tipo:</label>
+                        <select id="tipo" name="tipo" required>
+                            <option value="perifericos" <%= producto.tipo === 'perifericos' ? 'selected' : '' %>>Periféricos</option>
+                            <option value="escritorio" <%= producto.tipo === 'escritorio' ? 'selected' : '' %>>Escritorio</option>
+                        </select>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label for="precio">Precio ($ ARS):</label>
+                        <input type="number" step="0.01" id="precio" name="precio" value="<%= producto.precio %>" required>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label for="stock">Stock disponible:</label>
+                        <input type="number" id="stock" name="stock" value="<%= producto.stock %>" required>
+                        <small class="texto-ayuda">Si el stock llega a 0, el producto se dará de baja automáticamente.</small>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label for="imagenArchivo">Modificar imagen (Seleccionar archivo):</label>
+                        <input type="file" id="imagenArchivo" name="imagenArchivo" accept="image/*" onchange="verPrevia(event)">
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label for="tamanoImagen">Tamaño de visualización en catálogo:</label>
+                        <select id="tamanoImagen" name="tamanoImagen" class="select-tamano">
+                            <option value="normal">Normal (Estándar)</option>
+                            <option value="compacto">Compacto (Pequeña)</option>
+                            <option value="destacado">Destacado (Grande)</option>
+                        </select>
+                    </div>
+
+                    <div class="botones-form-acciones">
+                        <button type="submit" class="btn-guardar">Guardar Cambios</button>
+                        <a href="/admin/productos" class="btn-cancelar">Cancelar</a>
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
     </div>
+
+    <!-- Script para previsualizar la nueva imagen seleccionada -->
+    <script>
+        function verPrevia(event) {
+            const archivo = event.target.files[0];
+            if (archivo) {
+                const lector = new FileReader();
+                lector.onload = function(e) {
+                    document.getElementById('imgPreview').src = e.target.result;
+                }
+                lector.readAsDataURL(archivo);
+            }
+        }
+    </script>
 
 </body>
 </html>

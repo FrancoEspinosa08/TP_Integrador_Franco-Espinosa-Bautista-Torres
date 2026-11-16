@@ -1,10 +1,12 @@
-const Producto = require('../models/productoModel');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { Producto, Venta, DetalleVenta, Usuario } = require('../models/asociaciones');
 const PDFDocument = require('pdfkit');
 
+const JWT_SECRET = 'secreto_tp_integrador_utn';
 let ultimoTicket = null;
 
 const productoController = {
-    // Listar catálogo para clientes (solo productos activos)
     listarCatalogo: async (req, res) => {
         try {
             let productos = await Producto.findAll({ where: { activo: true } });
@@ -41,10 +43,14 @@ const productoController = {
 
     agregarProducto: async (req, res) => {
         try {
-            const { nombre, tipo, precio, stock, imagen } = req.body;
+            const { nombre, tipo, precio, stock } = req.body;
             let stockNum = parseInt(stock) || 10;
             
-            // Regla de negocio: Si se crea con stock 0, nace inactivo
+            let rutaImagen = '/img/default.png';
+            if (req.file) {
+                rutaImagen = '/img/' + req.file.filename;
+            }
+
             let esActivo = stockNum > 0;
 
             await Producto.create({
@@ -52,7 +58,7 @@ const productoController = {
                 tipo,
                 precio,
                 stock: stockNum,
-                imagen: imagen || '/img/default.png',
+                imagen: rutaImagen,
                 activo: esActivo
             });
             res.redirect('/admin/productos');
@@ -64,16 +70,36 @@ const productoController = {
 
     listarProductosAdmin: async (req, res) => {
         try {
-            // El admin ve todos (activos e inactivos para poder reactivarlos)
-            const productos = await Producto.findAll();
-            res.render('dashboardProductos', { productos });
+            const paginaActual = parseInt(req.query.page) || 1;
+            const buscarId = req.query.buscarId ? parseInt(req.query.buscarId) : null;
+            const limite = 5;
+            const desplazamiento = (paginaActual - 1) * limite;
+
+            let queryOptions = {
+                limit: limite,
+                offset: desplazamiento,
+                order: [['id', 'ASC']]
+            };
+
+            if (buscarId) {
+                queryOptions.where = { id: buscarId };
+            }
+
+            const { count, rows: productos } = await Producto.findAndCountAll(queryOptions);
+            const totalPaginas = Math.ceil(count / limite) || 1;
+
+            res.render('dashboardProductos', {
+                productos,
+                paginaActual,
+                totalPaginas,
+                buscarId: buscarId || ''
+            });
         } catch (error) {
             console.error(error);
             res.status(500).send("Error al cargar los productos del administrador");
         }
     },
 
-    // Formulario de edición
     formEditarProducto: async (req, res) => {
         try {
             const producto = await Producto.findByPk(req.params.id);
@@ -83,13 +109,18 @@ const productoController = {
         }
     },
 
-    // Actualizar producto (imagen, precio, stock y regla de stock <= 0)
     actualizarProducto: async (req, res) => {
         try {
-            const { nombre, tipo, precio, stock, imagen } = req.body;
+            const { nombre, tipo, precio, stock } = req.body;
             let stockNum = parseInt(stock);
 
-            // Validación: Si el stock es 0 o menor, se fuerza a 0 y se da de baja lógica (activo: false)
+            const productoExistente = await Producto.findByPk(req.params.id);
+
+            let rutaImagen = productoExistente.imagen;
+            if (req.file) {
+                rutaImagen = '/img/' + req.file.filename;
+            }
+
             let nuevoActivo = true;
             if (stockNum <= 0) {
                 stockNum = 0;
@@ -101,7 +132,7 @@ const productoController = {
                 tipo,
                 precio,
                 stock: stockNum,
-                imagen,
+                imagen: rutaImagen,
                 activo: nuevoActivo
             }, {
                 where: { id: req.params.id }
@@ -114,15 +145,13 @@ const productoController = {
         }
     },
 
-    // Baja lógica / Reactivación (cambiar activo a false/true)
     cambiarEstadoProducto: async (req, res) => {
         try {
             const producto = await Producto.findByPk(req.params.id);
             if (producto) {
-                const nuevoEstado = !producto.activo; // Alterna entre true y false
+                const nuevoEstado = !producto.activo;
                 producto.activo = nuevoEstado;
 
-                // Si se da de alta (true) y su stock es 0, se fuerza a 1 automáticamente
                 if (nuevoEstado && producto.stock <= 0) {
                     producto.stock = 1;
                 }
@@ -148,20 +177,44 @@ const productoController = {
             }
 
             let total = 0;
-
             productos.forEach(producto => {
                 total += producto.precio * producto.cantidad;
             });
 
-            const fecha = new Date().toLocaleString('es-AR');
+            const fechaStr = new Date().toLocaleString('es-AR');
+
+            // 1. Crear la Venta principal en la base de datos
+            const nuevaVenta = await Venta.create({
+                nombreCliente: nombre,
+                total: total,
+                fecha: fechaStr
+            });
+
+            // 2. Guardar en la tabla intermedia (DetalleVenta) y actualizar stock de cada producto
+            for (let item of productos) {
+                const productoDb = await Producto.findByPk(item.id);
+                if (productoDb) {
+                    await DetalleVenta.create({
+                        ventaId: nuevaVenta.id,
+                        productoId: productoDb.id,
+                        cantidad: item.cantidad,
+                        precioUnitario: productoDb.precio
+                    });
+
+                    productoDb.stock -= item.cantidad;
+                    if (productoDb.stock <= 0) {
+                        productoDb.stock = 0;
+                        productoDb.activo = false;
+                    }
+                    await productoDb.save();
+                }
+            }
 
             ultimoTicket = {
-                nombre, productos, total, fecha, empresa: "Kiosco Tecnologico"
+                nombre, productos, total, fecha: fechaStr, empresa: "Kiosco Tecnologico"
             };
 
-            res.json({
-                success: true
-            });
+            res.json({ success: true });
 
         } catch (error) {
             console.error(error);
@@ -176,7 +229,6 @@ const productoController = {
         if (!ultimoTicket) {
             return res.redirect('/productos');
         }
-
         res.render('ticket', { ticket: ultimoTicket });
     },
 
@@ -195,7 +247,7 @@ const productoController = {
         doc.fontSize(20).text('TICKET DE COMPRA', { align: 'center' });
         doc.moveDown();
 
-        doc.fontSize(14).text('Kiosco Tecnologico', {align: 'center'});
+        doc.fontSize(14).text('Kiosco Tecnologico', { align: 'center' });
 
         doc.fontSize(12).text('Cliente: ' + ultimoTicket.nombre);
         doc.text('Fecha: ' + ultimoTicket.fecha);
@@ -215,18 +267,40 @@ const productoController = {
     },
 
     validarLoginAdmin: async (req, res) => {
-        const { correo, contrasena } = req.body;
+        try {
+            const { correo, contrasena } = req.body;
 
-        if (correo === "admin@gmail.com" && contrasena === "1234") {
-            try {
-                const productos = await Producto.findAll();
-                res.render('dashboardProductos', { productos });
-            } catch (error) {
-                console.error(error);
-                res.status(500).send("Error al cargar el panel de administración");
+            let usuario = await Usuario.findOne({ where: { correo } });
+
+            // Si el admin no existe en la BD, creamos uno por defecto con contraseña hasheada
+            if (!usuario && correo === "admin@gmail.com") {
+                const hashPassword = await bcrypt.hash("1234", 10);
+                usuario = await Usuario.create({
+                    correo: "admin@gmail.com",
+                    contrasena: hashPassword
+                });
             }
-        } else {
-            res.send("Correo o contraseña incorrectos.");
+
+            if (!usuario) {
+                return res.send("Correo o contraseña incorrectos.");
+            }
+
+            // Validar clave usando bcrypt
+            const passwordValid = await bcrypt.compare(contrasena, usuario.contrasena);
+
+            if (passwordValid) {
+                // Generar token JWT con vigencia de 2 horas
+                const token = jwt.sign({ id: usuario.id, correo: usuario.correo }, JWT_SECRET, { expiresIn: '2h' });
+
+                // Guardar token en cookie segura y redirigir
+                res.cookie('tokenAdmin', token, { httpOnly: true });
+                return res.redirect('/admin/productos');
+            } else {
+                return res.send("Correo o contraseña incorrectos.");
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Error en el servidor durante el login");
         }
     }
 };
