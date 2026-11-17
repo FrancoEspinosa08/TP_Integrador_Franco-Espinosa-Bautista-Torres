@@ -150,6 +150,51 @@ async function finalizarCompra() {
     }
 }
 
+// 1. Configurar la duración exacta de la sesión: 2 horas en milisegundos (7200000)
+const TIEMPO_SESION = 2 * 60 * 60 * 1000; 
+
+// 2. Control inteligente de sesión usando sessionStorage
+let tiempoExpiracion = sessionStorage.getItem('tokenExpiry');
+
+// Si no existe (inicio de sesión fresco), fijamos el tiempo por 2 horas exactas
+if (!tiempoExpiracion) {
+    tiempoExpiracion = new Date().getTime() + TIEMPO_SESION;
+    sessionStorage.setItem('tokenExpiry', tiempoExpiracion);
+}
+
+function actualizarRelojYContador() {
+    const ahora = new Date().getTime();
+    const distancia = tiempoExpiracion - ahora;
+
+    // Si el tiempo llegó a cero o pasó
+    if (distancia <= 0) {
+        sessionStorage.removeItem('tokenExpiry');
+        window.location.href = '/admin/logout'; // Redirige al login de forma segura
+        return;
+    }
+
+    // Calcular horas, minutos y segundos restantes
+    const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
+    const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
+
+    // Formatear con ceros a la izquierda (ej: 02:00:00, 01:59:59)
+    const formatoContador = 
+        String(horas).padStart(2, '0') + ':' + 
+        String(minutos).padStart(2, '0') + ':' + 
+        String(segundos).padStart(2, '0');
+
+    // Mostrar en el header al lado del badge de admin
+    const elementoReloj = document.getElementById('reloj-admin');
+    if (elementoReloj) {
+        elementoReloj.textContent = "Expira en: " + formatoContador;
+    }
+}
+
+// Ejecutar cada 1 segundo exacto
+setInterval(actualizarRelojYContador, 1000);
+actualizarRelojYContador();
+
 function reiniciarKiosco() {
     carritoCompras = [];
     actualizarVistaCarrito();
