@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Producto, Venta, DetalleVenta, Usuario } = require('../models/asociaciones');
-const PDFDocument = require('pdfkit');
+const puppeteer = require('puppeteer');
 
 const JWT_SECRET = 'secreto_tp_integrador_utn';
 let ultimoTicket = null;
@@ -232,38 +232,77 @@ const productoController = {
         res.render('ticket', { ticket: ultimoTicket });
     },
 
-    generarPDF: (req, res) => {
-        if (!ultimoTicket) {
-            return res.redirect('/productos');
-        }
+    generarPDF: async (req, res) => {
+    if (!ultimoTicket) {
+        return res.redirect('/productos');
+    }
 
-        const doc = new PDFDocument();
+    try {
+        const navegador = await puppeteer.launch({
+            headless: true
+        });
+
+        const pagina = await navegador.newPage();
+
+        const html = `
+            <html>
+            <head>
+                <style>
+                    body {
+                        font-family: Arial;
+                        padding: 30px;
+                    }
+                    h1, h2 {
+                        text-align: center;
+                    }
+                    .total {
+                        font-size: 18px;
+                        font-weight: bold;
+                        margin-top: 20px;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>TICKET DE COMPRA</h1>
+                <h2>Kiosco Tecnologico</h2>
+
+                <p>Cliente: ${ultimoTicket.nombre}</p>
+                <p>Fecha: ${ultimoTicket.fecha}</p>
+
+                <hr>
+
+                ${ultimoTicket.productos.map(producto => `
+                    <p>
+                        ${producto.cantidad} x ${producto.nombre}
+                        - $${(producto.precio * producto.cantidad).toFixed(2)}
+                    </p>
+                `).join('')}
+
+                <p class="total">
+                    TOTAL: $${ultimoTicket.total.toFixed(2)}
+                </p>
+            </body>
+            </html>
+        `;
+
+        await pagina.setContent(html);
+
+        const pdf = await pagina.pdf({
+            format: 'A4',
+            printBackground: true
+        });
+
+        await navegador.close();
 
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'attachment; filename=ticket.pdf');
 
-        doc.pipe(res);
+        res.send(pdf);
 
-        doc.fontSize(20).text('TICKET DE COMPRA', { align: 'center' });
-        doc.moveDown();
-
-        doc.fontSize(14).text('Kiosco Tecnologico', { align: 'center' });
-
-        doc.fontSize(12).text('Cliente: ' + ultimoTicket.nombre);
-        doc.text('Fecha: ' + ultimoTicket.fecha);
-        doc.moveDown();
-
-        ultimoTicket.productos.forEach(producto => {
-            doc.text(
-                producto.cantidad + ' x ' + producto.nombre +
-                ' - $' + (producto.precio * producto.cantidad).toFixed(2)
-            );
-        });
-
-        doc.moveDown();
-        doc.fontSize(16).text('TOTAL: $' + ultimoTicket.total.toFixed(2));
-
-        doc.end();
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error al generar el PDF');
+        }
     },
 
     validarLoginAdmin: async (req, res) => {

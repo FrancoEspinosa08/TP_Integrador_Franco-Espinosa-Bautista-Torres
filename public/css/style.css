@@ -329,6 +329,25 @@ header h1 {
     gap: 15px;
 }
 
+.btn-volver-login {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--color-primario);
+    background-color: var(--color-blanco);
+    border: 1px solid var(--color-primario);
+    border-radius: 6px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.btn-volver-login:hover {
+    background-color: var(--color-fondo);
+}
+
 .campo-login-grupo {
     display: flex;
     flex-direction: column;

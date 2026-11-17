@@ -23,7 +23,7 @@ app.use('/', productoRoutes);
 
 // 4. Conexión a la Base de Datos y arranque del servidor
 const PORT = 3000;
-sequelize.sync({ alter: true }).then(() => {
+sequelize.sync().then(() => {
     console.log('Base de datos conectada correctamente con Sequelize');
     app.listen(PORT, () => {
         console.log(`Servidor corriendo en http://localhost:${PORT}`);
@@ -31,3 +31,4 @@ sequelize.sync({ alter: true }).then(() => {
 }).catch(err => {
     console.error('Error al conectar con la base de datos:', err);
 });
+
