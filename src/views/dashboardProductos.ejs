@@ -9,63 +9,64 @@
 <body>
 
     <header>
-        <h1>Panel de Administración - Productos</h1>
-    <div class="admin-titulo">
-        <h2>Panel de Administración - Kiosco Tecnológico</h2>
-    </div>
-    
-    <div class="admin-user-info">
-        <span class="admin-badge">Admin</span>
-        <span id="reloj-admin" class="admin-reloj">--:--:--</span>
-        <a href="/admin/logout" class="btn-logout">Cerrar Sesión</a>
-    </div>
+        <div class="admin-titulo">
+            <h2>Panel de Administración - Kiosco Tecnológico</h2>
+        </div>
+        
+        <div class="admin-user-info">
+            <span class="admin-badge">Admin</span>
+            <span id="reloj-admin" class="admin-reloj">Expira en: 02:00:00</span>
+            <!-- Limpiamos el sessionStorage antes de ir a la ruta de logout -->
+            <a href="/admin/logout" class="btn-logout" onclick="sessionStorage.removeItem('tokenExpiry');">Cerrar Sesión</a>
+        </div>
 
-<!-- Script para mostrar la hora en vivo -->
-            <script>
-    // 1. Configurar la duración exacta de la sesión: 2 horas en milisegundos (2 * 60 * 60 * 1000 = 7200000)
-    const TIEMPO_SESION = 2 * 60 * 60 * 1000; 
+        <!-- Script para mostrar la hora en vivo y controlar la sesión -->
+        <script>
+            // 1. Configurar la duración exacta de la sesión: 2 horas en milisegundos (7200000)
+            const TIEMPO_SESION = 2 * 60 * 60 * 1000; 
 
-    // 2. Control inteligente de sesión: Si venimos del login, forzamos un nuevo conteo de 2 horas.
-    // Usamos sessionStorage para que dure mientras la pestaña esté abierta.
-    let tiempoExpiracion = sessionStorage.getItem('tokenExpiry');
-    
-    // Si no existe o querés asegurarte de resetearlo al entrar al dashboard:
-    // (Opcional: podés limpiar el storage al loguearte desde el backend, pero acá lo controlamos)
-    if (!tiempoExpiracion) {
-        tiempoExpiracion = new Date().getTime() + TIEMPO_SESION;
-        sessionStorage.setItem('tokenExpiry', tiempoExpiracion);
-    }
+            // 2. Control inteligente de sesión usando sessionStorage
+            let tiempoExpiracion = sessionStorage.getItem('tokenExpiry');
+            
+            // Si no existe (inicio de sesión fresco), fijamos el tiempo por 2 horas exactas
+            if (!tiempoExpiracion) {
+                tiempoExpiracion = new Date().getTime() + TIEMPO_SESION;
+                sessionStorage.setItem('tokenExpiry', tiempoExpiracion);
+            }
 
-    function actualizarRelojYContador() {
-        const ahora = new Date().getTime();
-        const distancia = tiempoExpiracion - ahora;
+            function actualizarRelojYContador() {
+                const ahora = new Date().getTime();
+                const distancia = tiempoExpiracion - ahora;
 
-        // Si el tiempo llegó a cero o pasó
-        if (distancia <= 0) {
-            sessionStorage.removeItem('tokenExpiry');
-            window.location.href = '/admin/logout'; // Redirige al login de forma segura
-            return;
-        }
+                // Si el tiempo llegó a cero o pasó
+                if (distancia <= 0) {
+                    sessionStorage.removeItem('tokenExpiry');
+                    window.location.href = '/admin/logout'; // Redirige al login de forma segura
+                    return;
+                }
 
-        // Calcular horas, minutos y segundos restantes
-        const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
-        const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
+                // Calcular horas, minutos y segundos restantes
+                const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
+                const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
 
-        // Formatear con ceros a la izquierda (ej: 02:00:00, 01:59:59)
-        const formatoContador = 
-            String(horas).padStart(2, '0') + ':' + 
-            String(minutos).padStart(2, '0') + ':' + 
-            String(segundos).padStart(2, '0');
+                // Formatear con ceros a la izquierda (ej: 02:00:00, 01:59:59)
+                const formatoContador = 
+                    String(horas).padStart(2, '0') + ':' + 
+                    String(minutos).padStart(2, '0') + ':' + 
+                    String(segundos).padStart(2, '0');
 
-        // Mostrar en el header al lado del badge de admin
-        document.getElementById('reloj-admin').textContent = "Expira en: " + formatoContador;
-    }
+                // Mostrar en el header al lado del badge de admin
+                const elementoReloj = document.getElementById('reloj-admin');
+                if (elementoReloj) {
+                    elementoReloj.textContent = "Expira en: " + formatoContador;
+                }
+            }
 
-    // Ejecutar cada 1 segundo exacto
-    setInterval(actualizarRelojYContador, 1000);
-    actualizarRelojYContador();
-</script>
+            // Ejecutar cada 1 segundo exacto
+            setInterval(actualizarRelojYContador, 1000);
+            actualizarRelojYContador();
+        </script>
     </header>
 
     <div class="contenedor-principal">
