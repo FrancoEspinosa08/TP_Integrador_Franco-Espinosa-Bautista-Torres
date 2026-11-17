@@ -36,10 +36,17 @@
                 </div>
 
                 <button type="submit" class="btn-ingresar-admin">Ingresar</button>
+                
+                <!-- Botón de acceso rápido para los profesores / testers -->
+                <button type="button" onclick="autocompletarAdmin()" class="btn-ingresar-admin" style="background-color: #0284c7; margin-top: 10px;">
+                    ⚡ Acceso Rápido (Tester)
+                </button>
             </form>
             <a href="/" class="btn-volver-login">Volver</a>
         </div>
     </div>
 
+    <!-- Vinculamos tu script global para que tome la función de autocompletado -->
+    <script src="/js/script.js"></script>
 </body>
 </html>

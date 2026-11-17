@@ -219,3 +219,20 @@ function salirCliente(){
 if (document.getElementById("nombre-cliente")) {
     mostrarNombreCliente();
 }
+
+// --- ACCESO RÁPIDO PARA TESTERS (LOGIN) ---
+function autocompletarAdmin() {
+    const inputCorreo = document.getElementById('correo');
+    const inputContrasena = document.getElementById('contrasena');
+    
+    if (inputCorreo && inputContrasena) {
+        // Reemplaza con el correo y contraseña reales de tu base de datos / seed
+        inputCorreo.value = 'admin@gmail.com';
+        inputContrasena.value = '1234';
+    }
+}
+
+// Si detectamos que estamos en la pantalla de login, limpiamos cualquier residuo previo del reloj
+if (document.querySelector('.login-card-admin')) {
+    sessionStorage.removeItem('tokenExpiry');
+}
