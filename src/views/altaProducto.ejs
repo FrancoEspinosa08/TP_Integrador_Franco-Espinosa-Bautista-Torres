@@ -95,6 +95,10 @@
                 lector.readAsDataURL(archivo);
             }
         }
+        (function () {
+        const temaGuardado = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', temaGuardado);
+        })();
     </script>
 
 </body>

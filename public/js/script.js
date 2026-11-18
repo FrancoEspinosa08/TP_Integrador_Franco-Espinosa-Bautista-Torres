@@ -236,3 +236,38 @@ function autocompletarAdmin() {
 if (document.querySelector('.login-card-admin')) {
     sessionStorage.removeItem('tokenExpiry');
 }
+
+// --- GESTIÓN DE TEMA CLARO / OSCURO (PERSISTENTE CON LOCALSTORAGE) ---
+
+// 1. Aplicar el tema guardado apenas inicia el script (antes de renderizar todo)
+(function inicializarTema() {
+    const temaGuardado = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', temaGuardado);
+    
+    // Actualizar icono/texto del botón si ya cargó el DOM
+    window.addEventListener('DOMContentLoaded', () => {
+        actualizarTextoBotonTema(temaGuardado);
+    });
+})();
+
+// 2. Función para alternar entre claro y oscuro
+function alternarTema() {
+    const temaActual = document.documentElement.getAttribute('data-theme');
+    const nuevoTema = temaActual === 'dark' ? 'light' : 'dark';
+
+    // Aplicar al HTML raíz
+    document.documentElement.setAttribute('data-theme', nuevoTema);
+    
+    // Guardar en localStorage para que persista al recargar
+    localStorage.setItem('theme', nuevoTema);
+
+    actualizarTextoBotonTema(nuevoTema);
+}
+
+// 3. Cambiar el icono del botón dinámicamente
+function actualizarTextoBotonTema(tema) {
+    const boton = document.getElementById('btn-toggle-tema');
+    if (boton) {
+        boton.textContent = tema === 'dark' ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+    }
+}

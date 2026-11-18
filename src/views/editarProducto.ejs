@@ -64,15 +64,6 @@
                         <input type="file" id="imagenArchivo" name="imagenArchivo" accept="image/*" onchange="verPrevia(event)">
                     </div>
 
-                    <div class="campo-grupo">
-                        <label for="tamanoImagen">Tamaño de visualización en catálogo:</label>
-                        <select id="tamanoImagen" name="tamanoImagen" class="select-tamano">
-                            <option value="normal">Normal (Estándar)</option>
-                            <option value="compacto">Compacto (Pequeña)</option>
-                            <option value="destacado">Destacado (Grande)</option>
-                        </select>
-                    </div>
-
                     <div class="botones-form-acciones">
                         <button type="submit" class="btn-guardar">Guardar Cambios</button>
                         <a href="/admin/productos" class="btn-cancelar">Cancelar</a>
@@ -96,7 +87,11 @@
                 lector.readAsDataURL(archivo);
             }
         }
-    </script>
+        (function () {
+        const temaGuardado = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', temaGuardado);
+        })();
+        </script>
 
 </body>
 </html>
